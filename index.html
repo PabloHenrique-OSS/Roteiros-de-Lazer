@@ -134,33 +134,168 @@
   </footer>
 
 </body>
+  <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RolêCerto - Gerador de Roteiros de Lazer</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center p-4 md:p-8 font-sans">
+
+  <header class="w-full max-w-xl text-center mb-8">
+    <div class="inline-flex items-center gap-2 bg-slate-800 border border-slate-700 px-4 py-1.5 rounded-full text-xs font-medium text-amber-400 mb-4">
+      <span>☀️ São Paulo, SP • 24°C Ensolarado</span>
+    </div>
+    <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+      RolêCerto 🎯
+    </h1>
+    <p class="text-slate-400 text-sm mt-2">
+      Descubra o que fazer hoje sem estourar o orçamento.
+    </p>
+  </header>
+
+  <main class="w-full max-w-xl bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl backdrop-blur-sm space-y-6">
+    
+    <form id="roleForm" onsubmit="return false;">
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <label for="budgetRange" class="text-sm font-semibold text-slate-300">
+            💵 Orçamento Máximo:
+          </label>
+          <span id="budgetValue" class="text-lg font-bold text-emerald-400">R$ 50,00</span>
+        </div>
+        <input 
+          type="range" 
+          id="budgetRange" 
+          min="0" 
+          max="200" 
+          step="10" 
+          value="50" 
+          class="w-full accent-amber-500 bg-slate-700 rounded-lg h-2 cursor-pointer"
+        />
+        <div class="flex justify-between text-xs text-slate-500 mt-1">
+          <span>R$ 0 (Grátis)</span>
+          <span>R$ 100</span>
+          <span>R$ 200+</span>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="text-sm font-semibold text-slate-300 block mb-3">
+          😃 Qual é a vibe de hoje?
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" class="mood-btn p-3 rounded-xl border border-amber-500 bg-amber-500/10 text-amber-400 text-sm font-medium text-left">
+            🧘 Zen / Calmo
+          </button>
+          <button type="button" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
+            ⚡ Energia Alta
+          </button>
+          <button type="button" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
+            🎨 Cultural
+          </button>
+          <button type="button" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
+            🍕 Gastronômico
+          </button>
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg"
+      >
+        ✨ Gerar Meu Roteiro
+      </button>
+    </form>
+
+  </main>
+
+  <section id="resultSection" class="w-full max-w-xl mt-6 bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+    
+    <div class="flex justify-between items-start mb-4 border-b border-slate-700 pb-4">
+      <div>
+        <h2 class="text-xl font-bold text-amber-400">Rolê ZEN Perfeito</h2>
+        <p class="text-xs text-slate-400">Sugestões personalizadas para o seu dia</p>
+      </div>
+      <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1 rounded-full font-bold">
+        Total: R$ 25,00
+      </span>
+    </div>
+
+    <div class="space-y-4 mb-6">
+      
+      <article class="flex gap-4 items-start">
+        <time class="bg-slate-900 border border-slate-700 text-amber-400 text-xs font-mono px-2.5 py-1 rounded-md mt-0.5">
+          10:00
+        </time>
+        <div class="flex-1">
+          <div class="flex justify-between items-center">
+            <h3 class="font-semibold text-slate-200 text-sm">Passeio pelo Parque Central</h3>
+            <span class="text-xs text-slate-400 font-medium">Grátis</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Caminhada ao ar livre e leitura na sombra das árvores.</p>
+        </div>
+      </article>
+
+      <article class="flex gap-4 items-start">
+        <time class="bg-slate-900 border border-slate-700 text-amber-400 text-xs font-mono px-2.5 py-1 rounded-md mt-0.5">
+          14:30
+        </time>
+        <div class="flex-1">
+          <div class="flex justify-between items-center">
+            <h3 class="font-semibold text-slate-200 text-sm">Café e Leitura na Livraria Local</h3>
+            <span class="text-xs text-slate-400 font-medium">R$ 25,00</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Um café especial acompanhado de um bom livro.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <a 
+      href="#" 
+      target="_blank" 
+      class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+    >
+      📲 Enviar Roteiro no WhatsApp
+    </a>
+
+  </section>
+
+  <footer class="mt-8 text-center text-xs text-slate-500">
+    <p>© 2026 RolêCerto • Feito para facilitar o seu final de semana</p>
+  </footer>
+
   <script>
-    // 1. Pega os elementos da tela
     const budgetRange = document.getElementById('budgetRange');
     const budgetValue = document.getElementById('budgetValue');
     const moodButtons = document.querySelectorAll('.mood-btn');
 
-    // 2. Atualiza o valor do dinheiro em tempo real
+    // Atualiza o valor monetário ao arrastar o slider
     budgetRange.addEventListener('input', (event) => {
       const valor = event.target.value;
       budgetValue.textContent = `R$ ${valor},00`;
     });
 
-    // 3. Deixa a seleção dos botões de humor interativa
+    // Alterna o estilo visual dos botões de humor ao clicar
     moodButtons.forEach(button => {
       button.addEventListener('click', () => {
-        // Remove o destaque de todos os botões
         moodButtons.forEach(btn => {
           btn.classList.remove('border-amber-500', 'bg-amber-500/10', 'text-amber-400');
           btn.classList.add('border-slate-700', 'bg-slate-900/50', 'text-slate-400');
         });
 
-        // Adiciona o destaque apenas no botão clicado
         button.classList.remove('border-slate-700', 'bg-slate-900/50', 'text-slate-400');
         button.classList.add('border-amber-500', 'bg-amber-500/10', 'text-amber-400');
       });
     });
   </script>
+
+</body>
+</html>
 </body>
 </html>
 </html>
