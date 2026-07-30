@@ -1,212 +1,209 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RolêCerto - Gerador de Roteiros de Lazer</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center p-4 md:p-8 font-sans">
+import React, { useState } from 'react';
+import { Sun, CloudRain, Compass, MapPin, Share2, Sparkles, DollarSign, Smile } from 'lucide-react';
 
-  <header class="w-full max-w-xl text-center mb-8">
-    <div class="inline-flex items-center gap-2 bg-slate-800 border border-slate-700 px-4 py-1.5 rounded-full text-xs font-medium text-amber-400 mb-4">
-      <span>☀️ São Paulo, SP • 24°C Ensolarado</span>
-    </div>
-    <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-      RolêCerto 🎯
-    </h1>
-    <p class="text-slate-400 text-sm mt-2">
-      Descubra o que fazer hoje sem estourar o orçamento.
-    </p>
-  </header>
+export default function RoleCertoApp() {
+  // Estados da aplicação
+  const [budget, setBudget] = useState(50);
+  const [mood, setMood] = useState('zen');
+  const [loading, setLoading] = useState(false);
+  const [itinerary, setItinerary] = useState(null);
 
-  <main class="w-full max-w-xl bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl backdrop-blur-sm space-y-6">
-    
-    <form id="roleForm" onsubmit="return false;">
-      <div class="mb-6">
-        <div class="flex justify-between items-center mb-2">
-          <label for="budgetRange" class="text-sm font-semibold text-slate-300">
-            💵 Orçamento Máximo:
-          </label>
-          <span id="budgetValue" class="text-lg font-bold text-emerald-400">R$ 50,00</span>
-        </div>
-        <input 
-          type="range" 
-          id="budgetRange" 
-          min="0" 
-          max="200" 
-          step="10" 
-          value="50" 
-          class="w-full accent-amber-500 bg-slate-700 rounded-lg h-2 cursor-pointer"
-        />
-        <div class="flex justify-between text-xs text-slate-500 mt-1">
-          <span>R$ 0 (Grátis)</span>
-          <span>R$ 100</span>
-          <span>R$ 200+</span>
-        </div>
-      </div>
+  // Banco de dados simulado de atrações
+  const database = {
+    zen: [
+      { name: "Passeio pelo Parque Central", cost: 0, time: "10:00", desc: "Caminhada ao ar livre e leitura na sombra das árvores." },
+      { name: "Café e Leitura na Livraria Local", cost: 25, time: "14:30", desc: "Um café especial acompanhado de um bom livro." },
+      { name: "Pôr do Sol no Mirante", cost: 0, time: "17:30", desc: "Apreciação da vista da cidade no fim de tarde." }
+    ],
+    energia: [
+      { name: "Aluguel de Bike na Orla/Ciclovia", cost: 15, time: "09:00", desc: "Pedalada energética para começar o dia." },
+      { name: "Almoço em Feira Gastronômica", cost: 35, time: "12:30", desc: "Opções variadas de street food com música ao vivo." },
+      { name: "Partida de Boliche com Amigos", cost: 45, time: "16:00", desc: "Diversão e competição amigável." }
+    ],
+    cultural: [
+      { name: "Visita ao Museu de Arte", cost: 10, time: "10:30", desc: "Exposições de arte moderna e fotografia." },
+      { name: "Almoço em Bistrô Histórico", cost: 40, time: "13:00", desc: "Culinária local em um ambiente tradicional." },
+      { name: "Sessão no Cinema de Rua", cost: 20, time: "16:30", desc: "Filme cult ou independente com pipoca." }
+    ],
+    gourmet: [
+      { name: "Tour pelo Mercado Municipal", cost: 0, time: "11:00", desc: "Degustação de queijos, frutas e iguarias locais." },
+      { name: "Almoço Executivo de Chef", cost: 60, time: "13:00", desc: "Menu de dois tempos em restaurante renomado." },
+      { name: "Sorvete Artesanal / Gelato", cost: 20, time: "16:00", desc: "Sobremesa para finalizar o passeio com chave de ouro." }
+    ]
+  };
 
-      <div class="mb-6">
-        <label class="text-sm font-semibold text-slate-300 block mb-3">
-          😃 Qual é a vibe de hoje?
-        </label>
-        <div class="grid grid-cols-2 gap-2" id="moodContainer">
-          <button type="button" data-mood="zen" class="mood-btn p-3 rounded-xl border border-amber-500 bg-amber-500/10 text-amber-400 text-sm font-medium text-left">
-            🧘 Zen / Calmo
-          </button>
-          <button type="button" data-mood="energia" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
-            ⚡ Energia Alta
-          </button>
-          <button type="button" data-mood="cultural" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
-            🎨 Cultural
-          </button>
-          <button type="button" data-mood="gourmet" class="mood-btn p-3 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-400 text-sm font-medium text-left hover:border-slate-600">
-            🍕 Gastronômico
-          </button>
-        </div>
-      </div>
+  // Algoritmo de geração de roteiro baseado nos filtros
+  const generateItinerary = () => {
+    setLoading(true);
+    setItinerary(null);
 
-      <button 
-        type="button" 
-        id="btnGenerate"
-        class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg"
-      >
-        ✨ Gerar Meu Roteiro
-      </button>
-    </form>
-
-  </main>
-
-  <section id="resultSection" class="w-full max-w-xl mt-6 bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl hidden">
-    
-    <div class="flex justify-between items-start mb-4 border-b border-slate-700 pb-4">
-      <div>
-        <h2 id="resultTitle" class="text-xl font-bold text-amber-400">Roteiro Gerado</h2>
-        <p class="text-xs text-slate-400">Sugestões personalizadas para o seu dia</p>
-      </div>
-      <span id="resultTotal" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1 rounded-full font-bold">
-        Total: R$ 0,00
-      </span>
-    </div>
-
-    <div id="itineraryList" class="space-y-4 mb-6">
-      </div>
-
-    <a 
-      id="whatsappLink"
-      href="#" 
-      target="_blank" 
-      class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
-    >
-      📲 Enviar Roteiro no WhatsApp
-    </a>
-
-  </section>
-
-  <footer class="mt-8 text-center text-xs text-slate-500">
-    <p>© 2026 RolêCerto • Feito para facilitar o seu final de semana</p>
-  </footer>
-
-  <script>
-    // Banco de dados de atrações
-    const database = {
-      zen: [
-        { name: "Passeio pelo Parque Central", cost: 0, time: "10:00", desc: "Caminhada ao ar livre e leitura na sombra das árvores." },
-        { name: "Café e Leitura na Livraria Local", cost: 25, time: "14:30", desc: "Um café especial acompanhado de um bom livro." },
-        { name: "Pôr do Sol no Mirante", cost: 0, time: "17:30", desc: "Apreciação da vista da cidade no fim de tarde." }
-      ],
-      energia: [
-        { name: "Aluguel de Bike na Ciclovia", cost: 15, time: "09:00", desc: "Pedalada energética para começar o dia." },
-        { name: "Almoço em Feira Gastronômica", cost: 35, time: "12:30", desc: "Opções variadas de street food com música ao vivo." },
-        { name: "Partida de Boliche com Amigos", cost: 45, time: "16:00", desc: "Diversão e competição amigável." }
-      ],
-      cultural: [
-        { name: "Visita ao Museu de Arte", cost: 10, time: "10:30", desc: "Exposições de arte moderna e fotografia." },
-        { name: "Almoço em Bistrô Histórico", cost: 40, time: "13:00", desc: "Culinária local em um ambiente tradicional." },
-        { name: "Sessão no Cinema de Rua", cost: 20, time: "16:30", desc: "Filme cult ou independente com pipoca." }
-      ],
-      gourmet: [
-        { name: "Tour pelo Mercado Municipal", cost: 0, time: "11:00", desc: "Degustação de queijos, frutas e iguarias locais." },
-        { name: "Almoço Executivo de Chef", cost: 60, time: "13:00", desc: "Menu de dois tempos em restaurante renomado." },
-        { name: "Sorvete Artesanal / Gelato", cost: 20, time: "16:00", desc: "Sobremesa para finalizar o passeio com chave de ouro." }
-      ]
-    };
-
-    // Elementos da Tela
-    const budgetRange = document.getElementById('budgetRange');
-    const budgetValue = document.getElementById('budgetValue');
-    const moodButtons = document.querySelectorAll('.mood-btn');
-    const btnGenerate = document.getElementById('btnGenerate');
-    const resultSection = document.getElementById('resultSection');
-    const resultTitle = document.getElementById('resultTitle');
-    const resultTotal = document.getElementById('resultTotal');
-    const itineraryList = document.getElementById('itineraryList');
-    const whatsappLink = document.getElementById('whatsappLink');
-
-    let selectedMood = 'zen';
-
-    // 1. Atualizar texto do dinheiro em tempo real
-    budgetRange.addEventListener('input', (e) => {
-      budgetValue.textContent = `R$ ${e.target.value},00`;
-    });
-
-    // 2. Alternar seleção dos botões de humor
-    moodButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        moodButtons.forEach(btn => {
-          btn.classList.remove('border-amber-500', 'bg-amber-500/10', 'text-amber-400');
-          btn.classList.add('border-slate-700', 'bg-slate-900/50', 'text-slate-400');
-        });
-
-        button.classList.remove('border-slate-700', 'bg-slate-900/50', 'text-slate-400');
-        button.classList.add('border-amber-500', 'bg-amber-500/10', 'text-amber-400');
-        
-        selectedMood = button.getAttribute('data-mood');
-      });
-    });
-
-    // 3. Gerar Roteiro ao clicar no botão
-    btnGenerate.addEventListener('click', () => {
-      const budgetMax = Number(budgetRange.value);
-      const pool = database[selectedMood] || database.zen;
-
-      let currentTotal = 0;
-      const filteredEvents = pool.filter(item => {
-        if (currentTotal + item.cost <= budgetMax || item.cost === 0) {
-          currentTotal += item.cost;
+    setTimeout(() => {
+      const selectedPool = database[mood] || database.zen;
+      
+      // Filtra e ajusta atrações de acordo com o orçamento
+      let total = 0;
+      const filteredEvents = selectedPool.filter(item => {
+        if (total + item.cost <= budget || item.cost === 0) {
+          total += item.cost;
           return true;
         }
         return false;
       });
 
-      const eventsToDisplay = filteredEvents.length > 0 ? filteredEvents : [pool[0]];
-      const totalCost = eventsToDisplay.reduce((acc, item) => acc + item.cost, 0);
-
-      // Renderizar o resultado na tela
-      resultTitle.textContent = `Rolê ${selectedMood.toUpperCase()} Perfeito`;
-      resultTotal.textContent = `Total: R$ ${totalCost},00`;
-
-      itineraryList.innerHTML = eventsToDisplay.map(item => `
-        <article class="flex gap-4 items-start">
-          <time class="bg-slate-900 border border-slate-700 text-amber-400 text-xs font-mono px-2.5 py-1 rounded-md mt-0.5">
-            ${item.time}
-          </time>
-          <div class="flex-1">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-slate-200 text-sm">${item.name}</h3>
-              <span class="text-xs text-slate-400 font-medium">${item.cost === 0 ? 'Grátis' : 'R$ ' + item.cost + ',00'}</span>
-            </div>
-            <p class="text-xs text-slate-400 mt-0.5">${item.desc}</p>
-          </div>
-        </article>
-      `).join('');
-
-      // Gerar link do WhatsApp
-      let msg = `🚀 *Meu Roteiro no RolêCerto*\n\n`;
-      eventsToDisplay.forEach(item => {
-        msg += `📍 *${item.time}* -${item.name} (${item.cost === 0 ? 'Grátis' : 'R$ ' + item.cost})\n`;
+      setItinerary({
+        title: `Rolê ${mood.toUpperCase()} Perfeito`,
+        totalCost: total,
+        events: filteredEvents.length > 0 ? filteredEvents : selectedPool.slice(0, 1)
       });
-      msg += `\n💰 *Gasto Total:* R$ ${totalCost},00`;
 
-      whatsappLink.href = `
+      setLoading(false);
+    }, 600); // Efeito de carregamento rápido
+  };
+
+  // Gerador de texto para compartilhamento no WhatsApp
+  const getWhatsAppLink = () => {
+    if (!itinerary) return '#';
+    let text = `🚀 *Meu Roteiro do Dia (RolêCerto)*\n\n`;
+    itinerary.events.forEach(e => {
+      text += `📍 *${e.time}* - ${e.name} (R$ ${e.cost})\n`;
+    });
+    text += `\n💰 *Gasto Total Estimado:* R$ ${itinerary.totalCost},00`;
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center p-4 md:p-8 font-sans">
+      
+      {/* Cabeçalho / Banner de Clima */}
+      <header className="w-full max-w-xl text-center mb-8">
+        <div className="inline-flex items-center gap-2 bg-slate-800 border border-slate-700 px-4 py-1.5 rounded-full text-xs font-medium text-amber-400 mb-4">
+          <Sun className="w-4 h-4 text-amber-400" />
+          <span>São Paulo, SP • 24°C Ensolarado</span>
+        </div>
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+          RolêCerto 🎯
+        </h1>
+        <p className="text-slate-400 text-sm mt-2">
+          Descubra o que fazer hoje sem estourar o orçamento.
+        </p>
+      </header>
+
+      {/* Painel Principais de Opções */}
+      <main className="w-full max-w-xl bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl backdrop-blur-sm space-y-6">
+        
+        {/* 1. Seleção de Orçamento */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-400" /> Orçamento Máximo:
+            </label>
+            <span className="text-lg font-bold text-emerald-400">R$ {budget},00</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="200" 
+            step="10" 
+            value={budget} 
+            onChange={(e) => setBudget(Number(e.target.value))}
+            className="w-full accent-amber-500 bg-slate-700 rounded-lg h-2 cursor-pointer"
+          />
+          <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <span>R$ 0 (Grátis)</span>
+            <span>R$ 100</span>
+            <span>R$ 200+</span>
+          </div>
+        </div>
+
+        {/* 2. Seleção de Humor (Mood) */}
+        <div>
+          <label className="text-sm font-semibold text-slate-300 flex items-center gap-2 mb-3">
+            <Smile className="w-4 h-4 text-amber-400" /> Qual é a vibe de hoje?
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { id: 'zen', label: '🧘 Zen / Calmo' },
+              { id: 'energia', label: '⚡ Energia Alta' },
+              { id: 'cultural', label: '🎨 Cultural' },
+              { id: 'gourmet', label: '🍕 Gastronômico' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setMood(item.id)}
+                className={`p-3 rounded-xl border text-sm font-medium transition-all text-left ${
+                  mood === item.id 
+                    ? 'bg-amber-500/10 border-amber-500 text-amber-400' 
+                    : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Botão Principal */}
+        <button
+          onClick={generateItinerary}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <span className="animate-pulse">Criando roteiro...</span>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5" /> Gerar Meu Roteiro
+            </>
+          )}
+        </button>
+
+      </main>
+
+      {/* Resultados / Exibição do Roteiro */}
+      {itinerary && (
+        <section className="w-full max-w-xl mt-6 bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl animate-fade-in">
+          <div className="flex justify-between items-start mb-4 border-b border-slate-700 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-amber-400">{itinerary.title}</h2>
+              <p className="text-xs text-slate-400">Sugestões personalizadas para o seu dia</p>
+            </div>
+            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1 rounded-full font-bold">
+              Total: R$ {itinerary.totalCost},00
+            </span>
+          </div>
+
+          {/* Linha do Tempo */}
+          <div className="space-y-4 mb-6">
+            {itinerary.events.map((event, idx) => (
+              <div key={idx} className="flex gap-4 items-start">
+                <span className="bg-slate-900 border border-slate-700 text-amber-400 text-xs font-mono px-2.5 py-1 rounded-md mt-0.5">
+                  {event.time}
+                </span>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold text-slate-200 text-sm">{event.name}</h3>
+                    <span className="text-xs text-slate-400 font-medium">
+                      {event.cost === 0 ? 'Grátis' : `R$ ${event.cost}`}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">{event.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Botão de Ação Secundário */}
+          <a
+            href={getWhatsAppLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+          >
+            <Share2 className="w-4 h-4" /> Enviar Roteiro no WhatsApp
+          </a>
+        </section>
+      )}
+
+    </div>
+  );
+}
